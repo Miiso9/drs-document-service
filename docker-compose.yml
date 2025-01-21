@@ -1,0 +1,53 @@
+version: ‘3
+name: drs-document
+services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3:4566
+      - HOSTNAME=localstack
+      - HOSTNAME_EXTERNAL=localstack
+      - DEFAULT_REGION=eu-central-1
+  aws-cli:
+    image: amazon/aws-cli
+    depends_on:
+      - localstack
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=eu-central-1
+    entrypoint: /bin/sh -c
+    command: >
+      "
+        aws --endpoint-url=http://localstack:4566 s3 mb s3://document-bucket
+      "
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: drsdocumentdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "8081:8080"
+    command: start-dev
+    volumes:
+      - ./keycloak-setup:/opt/keycloak/data/import
+    entrypoint: >
+      /bin/sh -c "
+        /opt/keycloak/bin/kc.sh start-dev --import-realm
+      "
+volumes:
+  postgres_data:

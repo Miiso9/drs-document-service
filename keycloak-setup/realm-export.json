@@ -1,0 +1,85 @@
+{
+  "realm": "DRS",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "drs-document",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "clientAuthenticatorType": "client-secret",
+      "secret": "client-secret",
+      "redirectUris": ["http://localhost:8080/*"],
+      "rootUrl": "http://localhost:8080",
+      "baseUrl": "/",
+      "adminUrl": "http://localhost:8080",
+      "defaultRoles": ["user"],
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "webOrigins": ["*"]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@mail.com",
+      "firstName": "Admin",
+      "lastName": "User",
+      "emailVerified": true,
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "adminpassword",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["admin"],
+      "clientRoles": {
+        "drs-document": ["admin"]
+      }
+    },
+    {
+      "username": "user",
+      "email": "user@mail.com",
+      "firstName": "Regular",
+      "lastName": "User",
+      "emailVerified": true,
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "userpassword",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["user"],
+      "clientRoles": {
+        "drs-document": ["user"]
+      }
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "user",
+        "description": "Default role for users"
+      },
+      {
+        "name": "admin",
+        "description": "Administrator role"
+      }
+    ],
+    "client": {
+      "drs-document": [
+        {
+          "name": "user",
+          "description": "Default role for users"
+        },
+        {
+          "name": "admin",
+          "description": "Administrator role"
+        }
+      ]
+    }
+  }
+}
