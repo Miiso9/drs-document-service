@@ -22,7 +22,7 @@ import java.util.UUID;
 public class DocumentController {
 
     @Autowired
-    DocumentService documentService;
+    private DocumentService documentService;
 
     @PreAuthorize("hasRole('ROLE_admin')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

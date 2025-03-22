@@ -42,27 +42,4 @@ public class AuthService {
 
         return keycloak.tokenManager().getAccessToken();
     }
-
-    public ResponseEntity<Map<String, String>> generateToken(String username, String password) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = keycloakAuthServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "password");
-        params.add("client_id", clientId);
-        params.add("client_secret", clientSecret);
-        params.add("username", username);
-        params.add("password", password);
-
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-
-        ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
-        Map<String, Object> responseBody = response.getBody();
-        String accessToken = (String) responseBody.get("access_token");
-
-        return ResponseEntity.ok(Map.of("access_token", accessToken));
-    }
 }
