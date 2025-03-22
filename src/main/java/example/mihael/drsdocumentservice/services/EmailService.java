@@ -56,9 +56,9 @@ public class EmailService {
 
         try {
             Response response = sendGrid.api(request);
-            log.info("Status Code: " + response.getStatusCode());
-            log.info("Response Body: " + response.getBody());
-            log.info("Response Headers: " + response.getHeaders().toString());
+            log.info("Status Code: {}", response.getStatusCode());
+            log.info("Response Body: {}", response.getBody());
+            log.info("Response Headers: {}", response.getHeaders());
         } catch (IOException ex) {
             log.error("Error sending email: " + ex.getMessage(), ex);
             throw ex;

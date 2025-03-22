@@ -1,5 +1,6 @@
 package example.mihael.drsdocumentservice.services;
 
+import example.mihael.drsdocumentservice.exceptions.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,9 +23,6 @@ public class S3Service {
     private final S3Client s3Client;
     private final String bucketName;
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String s3Bucket;
-
     public S3Service(S3Client s3Client, @Value("${cloud.aws.s3.bucket}") String bucketName) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
@@ -33,11 +31,11 @@ public class S3Service {
     public String uploadFileToS3(byte[] wordBytes, String originalFilename) throws IOException {
         try {
             String uuid = UUID.randomUUID().toString().substring(0, 8);
-            String objectKey = originalFilename.replace(" ","_").replace(".R","") + "_" + uuid + ".docx";
+            String objectKey = originalFilename.replace(".","_" + uuid + ".");
 
             try (InputStream inputStream = new ByteArrayInputStream(wordBytes)) {
                 s3Client.putObject(PutObjectRequest.builder()
-                        .bucket(s3Bucket)
+                        .bucket(bucketName)
                         .key(objectKey)
                         .build(), RequestBody.fromInputStream(inputStream, wordBytes.length));
             }
@@ -49,7 +47,7 @@ public class S3Service {
     }
 
     @Cacheable(cacheNames = "wordDocument", key = "#objectKey")
-    public byte[] downloadFileFromS3(String objectKey) throws IOException {
+    public byte[] downloadFileFromS3(String objectKey) throws ResourceNotFoundException {
         try {
             log.info("Retrieving Word document from storage with id: {}", objectKey);
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
@@ -62,7 +60,7 @@ public class S3Service {
             return objectBytes.asByteArray();
         } catch (S3Exception e) {
             log.error("Failed to download Word document from S3", e);
-            throw new IOException("Failed to download Word document from S3", e);
+            throw new ResourceNotFoundException("Failed to download Word document from S3");
         }
     }
 
